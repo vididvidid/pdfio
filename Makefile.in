@@ -104,11 +104,13 @@ LIBOBJS		=	\
 OBJS		=	\
 			$(LIBOBJS) \
 			examples/pdf2cairo.o \
+			examples/createCarioTestPDF.o \
 			testpdfio.o \
 			testttf.o
 TARGETS		=	\
 			$(LIBPDFIO) \
 			$(LIBPDFIO_STATIC) \
+			examples/createCarioTestPDF \
 			examples/pdf2cairo \
 			testpdfio \
 			testttf
@@ -134,6 +136,7 @@ EXAMPLES	=	\
 			examples/mmd.h \
 			examples/pdf2text.c \
 			examples/pdf2cairo.c \
+			examples/createCarioTestPDF.c \
 			examples/pdfioinfo.c
 
 
@@ -227,6 +230,11 @@ pdfio1.def: $(LIBOBJS) Makefile
 	echo "EXPORTS" >>$@
 	nm $(LIBOBJS) 2>/dev/null | grep "T _" | awk '{print $$3}' | \
 		grep -v '^_ttf' | sed -e '1,$$s/^_//' | sort >>$@
+
+# Simple box example
+examples/createCarioTestPDF:	examples/createCarioTestPDF.o $(LIBPDFIO)
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ examples/createCarioTestPDF.o $(LIBPDFIO) $(LIBS)
 
 
 # PDF to Cairo example 

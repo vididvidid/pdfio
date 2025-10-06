@@ -2,7 +2,7 @@
 #include <cairo/cairo.h>
 #include <stdio.h>
 #include <string.h>
-
+#include <ctype.h>
 // -- Graphics State Structure --
 typedef struct
 {
@@ -16,7 +16,9 @@ typedef struct
 #define MAX_GSTATE 64 // Maximum nesting of q/Q operators
 static graphics_state_t gstack[MAX_GSTATE];
 static int  gstack_ptr = 0; // Current position on the stack
-                            
+#define MAX_OPERANDS 256 // Maximum number of operands for a command
+static double operands[MAX_OPERANDS]; // the operand stack
+static int num_operands = 0; // Number of operands on the stack
 // 
 // 'push_gstate()' -- Save teh current graphics state.
 //
@@ -88,20 +90,6 @@ main( int argc,                       // I - Number of command-line args
   pdfioPageGetMediaBox(page, &mediabox);
   printf("Page 1 is %.2f wide and %.2f high.\n", mediabox.x2 - mediabox.x1, mediabox.y2-mediabox.y1);
 
-  // Open the page's content stream..
-  pdfio_stream_t *st = pdfioPageOpenStream(page, 0, true);
-  if (st)
-  {
-    char token[1024]; // A buffer to hold the token we read
-    puts("\n--- Page 1 Content Stream Tokens ---");
-    while (pdfioStreamGetToken(st, token, sizeof(token)))
-    {
-      printf("TOKEN: '%s'\n", token);
-    }
-    puts("--- Ends of Tokens ---\n");
-    pdfioStreamClose(st);
-  }
-
 
   // Create a cairo surface and rendering context...
   surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, (int)(mediabox.x2 - mediabox.x1), (int)(mediabox.y2 - mediabox.y1));
@@ -120,6 +108,139 @@ main( int argc,                       // I - Number of command-line args
   // Set a white background for now..
   cairo_set_source_rgb(cr, 1.0, 1.0, 1.0);
   cairo_paint(cr);
+
+  // Open the page's content stream..
+  pdfio_stream_t *st = pdfioPageOpenStream(page, 0, true);
+
+
+
+  if (st)
+  {
+    char token[1024]; // Token from stream
+
+    puts("\n---- Executing Page 1 Content Stream ---");
+    while (pdfioStreamGetToken(st, token, sizeof(token)))
+    {
+      if (isdigit(token[0]) || token[0] == '.' || token[0] == '-')
+      {
+        // We have a number, push it on the operand stack
+        if (num_operands < MAX_OPERANDS)
+          operands[num_operands++] = atof(token);
+      }
+      else
+      {
+        // We have a command, process it...
+        printf("DEBUG: Executing command '%s' with '%d' operands. \n", token, num_operands);
+        if (!strcmp(token, "q"))
+        {
+          // Save graphics state
+          push_gstate(cr);
+        }
+        else if (!strcmp(token, "Q"))
+        {
+          // Restore graphics state
+          pop_gstate(cr);
+        }
+        else if (!strcmp(token, "cm"))
+        {
+          //  Concatenate matrix
+          if (num_operands == 6)
+          {
+            cairo_matrix_t matrix;
+            cairo_matrix_init(&matrix, operands[0], operands[1], operands[2], operands[3], operands[4], operands[5]);
+            cairo_transform(cr, &matrix);
+            printf("DEBUG: Contatenate matrix [%g %g %g %g %g %g].\n", operands[0], operands[1], operands[2], operands[3], operands[4], operands[5]);
+          }
+        }
+        else if (!strcmp(token, "w"))
+        {
+          // Set line width
+          if (num_operands == 1)
+          {
+            gstack[gstack_ptr].line_width = operands[0];
+            cairo_set_line_width(cr, operands[0]);
+            printf("DEBUG: Set line width to %g.\n",operands[0]);
+          }
+        }
+        else if (!strcmp(token, "rg"))
+        {
+          // Set fill Color (RGB)
+          if (num_operands == 3)
+          {
+            gstack[gstack_ptr].fill_rgb[0] = operands[0];
+            gstack[gstack_ptr].fill_rgb[1] = operands[1];
+            gstack[gstack_ptr].fill_rgb[2] = operands[2];
+            cairo_set_source_rgb(cr, operands[0], operands[1], operands[2]);
+            printf("DEBUG: Set fill color to %g %g %g \n", operands[0], operands[1], operands[2]);
+          }
+        }
+        else if (!strcmp(token, "RG"))
+        {
+          // Set Stroke Color (RGB)
+          if (num_operands == 3)
+          {
+            gstack[gstack_ptr].stroke_rgb[0] = operands[0];
+            gstack[gstack_ptr].stroke_rgb[1] = operands[1];
+            gstack[gstack_ptr].stroke_rgb[2] = operands[2];
+            cairo_set_source_rgb(cr, operands[0], operands[1], operands[2]);
+            printf("DEBUG: Set stroke color to %g %g %g \n", operands[0], operands[1], operands[2]);
+          }
+        }
+        else if (!strcmp(token, "m"))
+        {
+          //Move to 
+          if (num_operands == 2)
+          {
+            cairo_move_to(cr, operands[0], operands[1]);
+            printf("DEBUG: Move to (%g, %g). \n", operands[0], operands[1]);
+          }
+        }
+        else if (!strcmp(token, "l"))
+        {
+          // Line to
+          if (num_operands == 2)
+          {
+            cairo_line_to(cr, operands[0], operands[1]);
+            printf("DEBUG: Line to (%g %g).\n", operands[0], operands[1]);
+          }
+        }
+        else if (!strcmp(token, "re"))
+        {
+          // REctangle
+          if  (num_operands == 4)
+          {
+            cairo_rectangle(cr, operands[0], operands[1], operands[2], operands[3]);
+            printf("DEBUG: Rectangle at (%g, %g) size (%g %g) \n", operands[0], operands[1], operands[2], operands[3]);
+          }
+        }
+        else if (!strcmp(token, "h"))
+        {
+          // CLose Path
+          cairo_close_path(cr);
+          printf("DEBUG: Close path.\n");
+        }
+        else if (!strcmp(token, "S"))
+        {
+          // Stroke Path
+          cairo_stroke(cr);
+          printf("DEBUG: Stroke path.\n");
+        }
+        else if (!strcmp(token, "f"))
+        {
+          // Fill path
+          cairo_fill(cr);
+          printf("DEBUG:Fill Path.\n");
+        }
+
+        // Clear the operand stack for the next command
+        num_operands =0;
+      }
+    }
+    puts("--- End of Content Stream ---\n");
+    pdfioStreamClose(st);
+  }
+
+
 
   // Save to PNG..
   if (cairo_surface_write_to_png(surface, argv[2]) != CAIRO_STATUS_SUCCESS)
