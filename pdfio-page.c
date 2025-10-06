@@ -51,6 +51,37 @@ pdfioPageCopy(pdfio_file_t *pdf,	// I - PDF file
     return (_pdfioFileAddPage(pdf, dstpage));
 }
 
+//
+// 'pdfioPageGetMediaBox()' - Get the media box for a page.
+//
+
+bool					// O - `true` on success, `false` on failure
+pdfioPageGetMediaBox(
+    pdfio_obj_t  *page,			// I - Page object
+    pdfio_rect_t *mediabox)		// O - Media box
+{
+  pdfio_dict_t *dict;			// Page dictionary
+
+
+  if (!page || !mediabox)
+  {
+    if (mediabox)
+      memset(mediabox, 0, sizeof(pdfio_rect_t));
+
+    return (false);
+  }
+
+  if ((dict = pdfioObjGetDict(page)) == NULL)
+    return (false);
+
+  if (pdfioDictGetRect(dict, "MediaBox", mediabox))
+    return (true);
+
+  if ((page = pdfioDictGetObj(dict, "Parent")) != NULL)
+    return (pdfioPageGetMediaBox(page, mediabox));
+
+  return (false);
+}
 
 //
 // 'pdfioPageGetNumStreams()' - Get the number of content streams for a page object.

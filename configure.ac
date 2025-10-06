@@ -145,6 +145,19 @@ AS_IF([$PKGCONFIG --exists zlib], [
     PKGCONFIG_LIBS_PRIVATE="-lz $PKGCONFIG_LIBS_PRIVATE"
 ])
 
+dnl Cairo
+AC_MSG_CHECKING([for cairo via pkg-config])
+AS_IF([$PKGCONFIG --exists cairo], [
+       AC_MSG_RESULT([yes])
+       CPPFLAGS="$($PKGCONFIG --cflags cairo) $CPPFLAGS"
+       CAIRO_LIBS="$($PKGCONFIG --libs cairo)"
+],[
+   AC_MSG_RESULT([no])
+   AC_MSG_ERROR([Cairo development library not found. Please install libcairo2-dev or equivalent.])
+])
+AC_SUBST([CAIRO_LIBS])
+
+
 dnl libpng...
 AC_ARG_ENABLE([libpng], AS_HELP_STRING([--enable-libpng], [use libpng for pdfioFileCreateImageObjFromFile, default=auto]))
 

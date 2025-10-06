@@ -238,6 +238,7 @@ extern const char	*pdfioObjGetType(pdfio_obj_t *obj) _PDFIO_PUBLIC;
 extern pdfio_stream_t	*pdfioObjOpenStream(pdfio_obj_t *obj, bool decode) _PDFIO_PUBLIC;
 
 extern bool		pdfioPageCopy(pdfio_file_t *pdf, pdfio_obj_t *srcpage) _PDFIO_PUBLIC;
+extern bool		pdfioPageGetMediaBox(pdfio_obj_t *page, pdfio_rect_t *mediabox) _PDFIO_PUBLIC;
 extern size_t		pdfioPageGetNumStreams(pdfio_obj_t *page) _PDFIO_PUBLIC;
 extern pdfio_stream_t	*pdfioPageOpenStream(pdfio_obj_t *page, size_t n, bool decode) _PDFIO_PUBLIC;
 

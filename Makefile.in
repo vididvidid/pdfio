@@ -33,7 +33,7 @@ CSFLAGS		=	-s "$(CODESIGN_IDENTITY)" @CSFLAGS@ --timestamp
 DSOFLAGS	=	@DSOFLAGS@ $(CFLAGS)
 INSTALL		=	@INSTALL@
 LDFLAGS		=	@LDFLAGS@ $(OPTIM)
-LIBS		=	@LIBS@ -lm
+LIBS		=	@LIBS@ -lm @CAIRO_LIBS@
 LN		=	@LN@
 OPTIM		=	@OPTIM@
 RANLIB		=	@RANLIB@
@@ -103,11 +103,13 @@ LIBOBJS		=	\
 			ttf.o
 OBJS		=	\
 			$(LIBOBJS) \
+			examples/pdf2cairo.o \
 			testpdfio.o \
 			testttf.o
 TARGETS		=	\
 			$(LIBPDFIO) \
 			$(LIBPDFIO_STATIC) \
+			examples/pdf2cairo \
 			testpdfio \
 			testttf
 DOCFILES	=	\
@@ -131,6 +133,7 @@ EXAMPLES	=	\
 			examples/mmd.c \
 			examples/mmd.h \
 			examples/pdf2text.c \
+			examples/pdf2cairo.c \
 			examples/pdfioinfo.c
 
 
@@ -225,6 +228,11 @@ pdfio1.def: $(LIBOBJS) Makefile
 	nm $(LIBOBJS) 2>/dev/null | grep "T _" | awk '{print $$3}' | \
 		grep -v '^_ttf' | sed -e '1,$$s/^_//' | sort >>$@
 
+
+# PDF to Cairo example 
+examples/pdf2cairo:   examples/pdf2cairo.o $(LIBPDFIO)
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ examples/pdf2cairo.o $(LIBPDFIO) $(LIBS)
 
 # pdfio test program
 testpdfio:		testpdfio.o libpdfio.a

@@ -654,6 +654,7 @@ CSFLAGS
 LIBPDFIO_STATIC
 LIBPDFIO
 PKGCONFIG_LIBPNG
+CAIRO_LIBS
 PKGCONFIG_REQUIRES
 PKGCONFIG_LIBS_PRIVATE
 PKGCONFIG_LIBS
@@ -4220,6 +4221,26 @@ fi
     PKGCONFIG_LIBS_PRIVATE="-lz $PKGCONFIG_LIBS_PRIVATE"
 
 fi
+
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for cairo via pkg-config" >&5
+printf %s "checking for cairo via pkg-config... " >&6; }
+if $PKGCONFIG --exists cairo
+then :
+
+       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf "%s\n" "yes" >&6; }
+       CPPFLAGS="$($PKGCONFIG --cflags cairo) $CPPFLAGS"
+       CAIRO_LIBS="$($PKGCONFIG --libs cairo)"
+
+else $as_nop
+
+   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+   as_fn_error $? "Cairo development library not found. Please install libcairo2-dev or equivalent." "$LINENO" 5
+
+fi
+
+
 
 # Check whether --enable-libpng was given.
 if test ${enable_libpng+y}
