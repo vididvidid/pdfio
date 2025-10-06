@@ -37,6 +37,21 @@ main( int argc,                       // I - Number of command-line args
   pdfioPageGetMediaBox(page, &mediabox);
   printf("Page 1 is %.2f wide and %.2f high.\n", mediabox.x2 - mediabox.x1, mediabox.y2-mediabox.y1);
 
+  // Open the page's content stream..
+  pdfio_stream_t *st = pdfioPageOpenStream(page, 0, true);
+  if (st)
+  {
+    char token[1024]; // A buffer to hold the token we read
+    puts("\n--- Page 1 Content Stream Tokens ---");
+    while (pdfioStreamGetToken(st, token, sizeof(token)))
+    {
+      printf("TOKEN: '%s'\n", token);
+    }
+    puts("--- Ends of Tokens ---\n");
+    pdfioStreamClose(st);
+  }
+
+
   // Create a cairo surface and rendering context...
   surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, (int)(mediabox.x2 - mediabox.x1), (int)(mediabox.y2 - mediabox.y1));
   cr  = cairo_create(surface);
