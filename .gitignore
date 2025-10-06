@@ -17,6 +17,7 @@
 /examples/pdf2text
 /examples/pdfioinfo
 /examples/pdfiomerge
+/examples/createCarioTestPDF
 /Makefile
 /packages
 /pdfio.pc
