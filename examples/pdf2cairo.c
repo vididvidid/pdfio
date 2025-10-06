@@ -186,6 +186,31 @@ main( int argc,                       // I - Number of command-line args
             printf("DEBUG: Set stroke color to %g %g %g \n", operands[0], operands[1], operands[2]);
           }
         }
+        else if (!strcmp(token, "g"))
+        {
+          // Set fill Color (Grayscale)
+          if (num_operands == 1)
+          {
+            gstack[gstack_ptr].fill_rgb[0] = operands[0];
+            gstack[gstack_ptr].fill_rgb[1] = operands[0];
+            gstack[gstack_ptr].fill_rgb[2] = operands[0];
+            cairo_set_source_rgb(cr, operands[0], operands[0], operands[0]);
+            printf("DEBUG: Set fill color to gray %g\n", operands[0]);
+          }
+        }
+        else if (!strcmp(token, "G"))
+        {
+          // Set Stroke Color (Grayscale)
+          if (num_operands == 1)
+          {
+            gstack[gstack_ptr].stroke_rgb[0] = operands[0];
+            gstack[gstack_ptr].stroke_rgb[1] = operands[0];
+            gstack[gstack_ptr].stroke_rgb[2] = operands[0];
+            // To set a gray color in Cairo, you set R, G, and B to the same value.
+            cairo_set_source_rgb(cr, operands[0], operands[0], operands[0]);
+            printf("DEBUG: Set stroke color to gray %g\n", operands[0]);
+          }
+        }
         else if (!strcmp(token, "m"))
         {
           //Move to 

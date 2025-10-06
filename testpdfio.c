@@ -52,6 +52,7 @@ static int	write_png_tests(pdfio_file_t *pdf, int number, pdfio_obj_t *font);
 static int	write_text_test(pdfio_file_t *pdf, int first_page, pdfio_obj_t *font, const char *filename);
 static int	write_unit_file(pdfio_file_t *inpdf, const char *outname, pdfio_file_t *outpdf, size_t *num_pages, size_t *first_image);
 static int	do_pdfa_tests(void);
+static int do_renderer_tests(void);
 static int	create_pdfa_test_file(const char *filename, const char *pdfa_version);
 
 //
@@ -226,6 +227,60 @@ do_pdfa_tests(void)
     testEnd(true);
   }
   pdfioFileClose(fail_pdf);
+
+  return (status);
+}
+
+//
+// 'do_renderer_tests()' - Run the pdf2cairo renderer tests.
+//
+static int				// O - 0 on success, 1 on error
+do_renderer_tests(void)
+{
+  int status = 0;			// Exit status
+
+  puts("\n--- Running Renderer Tests ---");
+
+  // Create the output directory
+  testBegin("mkdir -p test/renderer-output");
+  if (system("mkdir -p test/renderer-output") != 0)
+  {
+    testEnd(false);
+    return (1);
+  }
+  testEnd(true);
+
+  // Test 1: Stroked box
+  testBegin("./examples/pdf2cairo 01_stroked_box.pdf");
+  if (system("./examples/pdf2cairo test/renderer/01_stroked_box.pdf test/renderer-output/01.png") != 0)
+  {
+    testEnd(false);
+    status = 1;
+  }
+  else
+    testEnd(true);
+
+  // Test 2: Filled RGB box
+  testBegin("./examples/pdf2cairo 02_filled_box_rgb.pdf");
+  if (system("./examples/pdf2cairo test/renderer/02_filled_box_rgb.pdf test/renderer-output/02.png") != 0)
+  {
+    testEnd(false);
+    status = 1;
+  }
+  else
+    testEnd(true);
+
+  // Test 3: Nested state box
+  testBegin("./examples/pdf2cairo 03_nested_state.pdf");
+  if (system("./examples/pdf2cairo test/renderer/03_nested_state.pdf test/renderer-output/03.png") != 0)
+  {
+    testEnd(false);
+    status = 1;
+  }
+  else
+    testEnd(true);
+
+  puts("--- Renderer tests finished. Check PNG files in test/renderer-output/ ---\n");
 
   return (status);
 }
@@ -1331,6 +1386,10 @@ do_unit_tests(void)
   
   // Do PDF/A tests...
   if (do_pdfa_tests())
+    return (1);
+
+  // Add this new call here
+  if (do_renderer_tests())
     return (1);
 
   return (0);

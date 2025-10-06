@@ -197,7 +197,6 @@ test:	testpdfio testttf
 	./testpdfio 2>>test.log
 	LANG=fr_FR.UTF-8 ./testpdfio 2>>test.log
 
-
 valgrind:	testpdfio
 	valgrind --leak-check=full ./testpdfio
 
