@@ -242,8 +242,8 @@ do_renderer_tests(void)
   puts("\n--- Running Renderer Tests ---");
 
   // Create the output directory
-  testBegin("mkdir -p test/renderer-output");
-  if (system("mkdir -p test/renderer-output") != 0)
+  testBegin("mkdir -p testfiles/renderer-output");
+  if (system("mkdir -p testfiles/renderer-output") != 0)
   {
     testEnd(false);
     return (1);
@@ -252,7 +252,7 @@ do_renderer_tests(void)
 
   // Test 1: Stroked box
   testBegin("./examples/pdf2cairo 01_stroked_box.pdf");
-  if (system("./examples/pdf2cairo test/renderer/01_stroked_box.pdf test/renderer-output/01.png") != 0)
+  if (system("./examples/pdf2cairo testfiles/renderer/01_stroked_box.pdf testfiles/renderer-output/01.png") != 0)
   {
     testEnd(false);
     status = 1;
@@ -262,7 +262,7 @@ do_renderer_tests(void)
 
   // Test 2: Filled RGB box
   testBegin("./examples/pdf2cairo 02_filled_box_rgb.pdf");
-  if (system("./examples/pdf2cairo test/renderer/02_filled_box_rgb.pdf test/renderer-output/02.png") != 0)
+  if (system("./examples/pdf2cairo testfiles/renderer/02_filled_box_rgb.pdf testfiles/renderer-output/02.png") != 0)
   {
     testEnd(false);
     status = 1;
@@ -272,7 +272,7 @@ do_renderer_tests(void)
 
   // Test 3: Nested state box
   testBegin("./examples/pdf2cairo 03_nested_state.pdf");
-  if (system("./examples/pdf2cairo test/renderer/03_nested_state.pdf test/renderer-output/03.png") != 0)
+  if (system("./examples/pdf2cairo testfiles/renderer/03_nested_state.pdf testfiles/renderer-output/03.png") != 0)
   {
     testEnd(false);
     status = 1;
@@ -280,7 +280,7 @@ do_renderer_tests(void)
   else
     testEnd(true);
 
-  puts("--- Renderer tests finished. Check PNG files in test/renderer-output/ ---\n");
+  puts("--- Renderer tests finished. Check PNG files in testfiles/renderer-output/ ---\n");
 
   return (status);
 }
