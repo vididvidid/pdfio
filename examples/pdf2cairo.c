@@ -72,14 +72,20 @@ main( int argc,                       // I - Number of command-line args
   char *input_filename = NULL;
   char *output_filename = NULL;
   int opt;
+  int pagenum = 1;
 
-  while ((opt = getopt(argc, argv, "o:")) != -1 )
+  while ((opt = getopt(argc, argv, "o:p:")) != -1 )
   {
     switch (opt)
     {
       case 'o': 
         output_filename = optarg;
         break;
+
+      case 'p':
+        pagenum = atoi(optarg);
+          break;
+
       default: /* '?' */
         fprintf(stderr, "Usage: %s [-o output.png] input.pdf\n", argv[0]);
         return (1);
@@ -103,7 +109,7 @@ main( int argc,                       // I - Number of command-line args
     return (1);
 
   // Get the first Page...
-  if ((page = pdfioFileGetPage(pdf, 0)) == NULL)
+  if ((page = pdfioFileGetPage(pdf, pagenum - 1)) == NULL)
   {
     fprintf(stderr, "Unable to get page 1 from '%s'.\n", argv[1]);
     pdfioFileClose(pdf);

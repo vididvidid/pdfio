@@ -262,7 +262,7 @@ do_renderer_tests(void)
 
   // Test 2: Filled RGB box
   testBegin("./examples/pdf2cairo 02_filled_box_rgb.pdf");
-  if (system("./examples/pdf2cairo testfiles/renderer/02_filled_box_rgb.pdf -o testfiles/renderer-output/02.png") != 0)
+  if (system("./examples/pdf2cairo -p 1 testfiles/renderer/02_filled_box_rgb.pdf -o testfiles/renderer-output/02.png") != 0)
   {
     testEnd(false);
     status = 1;
@@ -272,7 +272,7 @@ do_renderer_tests(void)
 
   // Test 3: Nested state box
   testBegin("./examples/pdf2cairo 03_nested_state.pdf");
-  if (system("./examples/pdf2cairo testfiles/renderer/03_nested_state.pdf -o testfiles/renderer-output/03.png") != 0)
+  if (system("./examples/pdf2cairo -p 1 testfiles/renderer/03_nested_state.pdf -o testfiles/renderer-output/03.png") != 0)
   {
     testEnd(false);
     status = 1;
