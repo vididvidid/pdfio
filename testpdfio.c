@@ -280,6 +280,17 @@ do_renderer_tests(void)
   else
     testEnd(true);
 
+  // Test 4: Analyze state box
+  testBegin("Analyze ./examples/pdf2cairo 03_nested_state.pdf");
+  if (system("./examples/pdf2cairo --analyze testfiles/renderer/03_nested_state.pdf") != 0)
+  {
+    testEnd(false);
+    status = 1;
+  }
+  else
+    testEnd(true);
+
+
   puts("--- Renderer tests finished. Check PNG files in testfiles/renderer-output/ ---\n");
 
   return (status);
