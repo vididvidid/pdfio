@@ -21,6 +21,8 @@ static int  gstack_ptr = 0; // Current position on the stack
 #define MAX_OPERANDS 256 // Maximum number of operands for a command
 static double operands[MAX_OPERANDS]; // the operand stack
 static int num_operands = 0; // Number of operands on the stack
+static int g_verbose = 0;
+
 // 
 // 'push_gstate()' -- Save teh current graphics state.
 //
@@ -32,7 +34,9 @@ push_gstate(cairo_t *cr)
     cairo_save(cr);
     memcpy(&gstack[gstack_ptr + 1], &gstack[gstack_ptr], sizeof(graphics_state_t));
     gstack_ptr++;
-    printf("DEBUG: Saved graphics state (level %d).\n", gstack_ptr);
+
+    if (g_verbose)
+      printf("DEBUG: Saved graphics state (level %d).\n", gstack_ptr);
   }
   else
   {
@@ -50,7 +54,9 @@ pop_gstate(cairo_t *cr)
   {
     cairo_restore(cr);
     gstack_ptr--;
-    printf("DEBUG: Restored graphics state (level %d). \n", gstack_ptr);
+
+    if (g_verbose)
+      printf("DEBUG: Restored graphics state (level %d). \n", gstack_ptr);
   }
   else
   {
@@ -75,7 +81,8 @@ main( int argc,                       // I - Number of command-line args
   int pagenum = 1;
   int dpi = 72;
 
-  while ((opt = getopt(argc, argv, "o:p:r:")) != -1 )
+
+  while ((opt = getopt(argc, argv, "o:p:r:v")) != -1 )
   {
     switch (opt)
     {
@@ -89,6 +96,10 @@ main( int argc,                       // I - Number of command-line args
 
       case 'r':
           dpi = atoi(optarg);
+          break;
+
+      case 'v':
+          g_verbose = 1;
           break;
 
       default: /* '?' */
@@ -123,7 +134,9 @@ main( int argc,                       // I - Number of command-line args
 
   // Get the page size....
   pdfioPageGetMediaBox(page, &mediabox);
-  printf("Page 1 is %.2f wide and %.2f high.\n", mediabox.x2 - mediabox.x1, mediabox.y2-mediabox.y1);
+
+  if (g_verbose)
+    printf("Page 1 is %.2f wide and %.2f high.\n", mediabox.x2 - mediabox.x1, mediabox.y2-mediabox.y1);
 
   double scale = dpi / 72.0;
 
@@ -172,7 +185,8 @@ main( int argc,                       // I - Number of command-line args
       else
       {
         // We have a command, process it...
-        printf("DEBUG: Executing command '%s' with '%d' operands. \n", token, num_operands);
+        if (g_verbose)
+          printf("DEBUG: Executing command '%s' with '%d' operands. \n", token, num_operands);
         if (!strcmp(token, "q"))
         {
           // Save graphics state
@@ -191,7 +205,9 @@ main( int argc,                       // I - Number of command-line args
             cairo_matrix_t matrix;
             cairo_matrix_init(&matrix, operands[0], operands[1], operands[2], operands[3], operands[4], operands[5]);
             cairo_transform(cr, &matrix);
-            printf("DEBUG: Contatenate matrix [%g %g %g %g %g %g].\n", operands[0], operands[1], operands[2], operands[3], operands[4], operands[5]);
+
+            if (g_verbose)
+              printf("DEBUG: Contatenate matrix [%g %g %g %g %g %g].\n", operands[0], operands[1], operands[2], operands[3], operands[4], operands[5]);
           }
         }
         else if (!strcmp(token, "w"))
@@ -201,7 +217,9 @@ main( int argc,                       // I - Number of command-line args
           {
             gstack[gstack_ptr].line_width = operands[0];
             cairo_set_line_width(cr, operands[0]);
-            printf("DEBUG: Set line width to %g.\n",operands[0]);
+            
+            if (g_verbose)
+              printf("DEBUG: Set line width to %g.\n",operands[0]);
           }
         }
         else if (!strcmp(token, "rg"))
@@ -213,7 +231,9 @@ main( int argc,                       // I - Number of command-line args
             gstack[gstack_ptr].fill_rgb[1] = operands[1];
             gstack[gstack_ptr].fill_rgb[2] = operands[2];
             cairo_set_source_rgb(cr, operands[0], operands[1], operands[2]);
-            printf("DEBUG: Set fill color to %g %g %g \n", operands[0], operands[1], operands[2]);
+
+            if (g_verbose)
+              printf("DEBUG: Set fill color to %g %g %g \n", operands[0], operands[1], operands[2]);
           }
         }
         else if (!strcmp(token, "RG"))
@@ -225,7 +245,9 @@ main( int argc,                       // I - Number of command-line args
             gstack[gstack_ptr].stroke_rgb[1] = operands[1];
             gstack[gstack_ptr].stroke_rgb[2] = operands[2];
             cairo_set_source_rgb(cr, operands[0], operands[1], operands[2]);
-            printf("DEBUG: Set stroke color to %g %g %g \n", operands[0], operands[1], operands[2]);
+
+            if (g_verbose)
+              printf("DEBUG: Set stroke color to %g %g %g \n", operands[0], operands[1], operands[2]);
           }
         }
         else if (!strcmp(token, "g"))
@@ -237,7 +259,9 @@ main( int argc,                       // I - Number of command-line args
             gstack[gstack_ptr].fill_rgb[1] = operands[0];
             gstack[gstack_ptr].fill_rgb[2] = operands[0];
             cairo_set_source_rgb(cr, operands[0], operands[0], operands[0]);
-            printf("DEBUG: Set fill color to gray %g\n", operands[0]);
+
+            if (g_verbose)
+              printf("DEBUG: Set fill color to gray %g\n", operands[0]);
           }
         }
         else if (!strcmp(token, "G"))
@@ -250,7 +274,9 @@ main( int argc,                       // I - Number of command-line args
             gstack[gstack_ptr].stroke_rgb[2] = operands[0];
             // To set a gray color in Cairo, you set R, G, and B to the same value.
             cairo_set_source_rgb(cr, operands[0], operands[0], operands[0]);
-            printf("DEBUG: Set stroke color to gray %g\n", operands[0]);
+            
+            if (g_verbose)
+              printf("DEBUG: Set stroke color to gray %g\n", operands[0]);
           }
         }
         else if (!strcmp(token, "m"))
@@ -259,7 +285,9 @@ main( int argc,                       // I - Number of command-line args
           if (num_operands == 2)
           {
             cairo_move_to(cr, operands[0], operands[1]);
-            printf("DEBUG: Move to (%g, %g). \n", operands[0], operands[1]);
+
+            if (g_verbose)
+              printf("DEBUG: Move to (%g, %g). \n", operands[0], operands[1]);
           }
         }
         else if (!strcmp(token, "l"))
@@ -268,7 +296,9 @@ main( int argc,                       // I - Number of command-line args
           if (num_operands == 2)
           {
             cairo_line_to(cr, operands[0], operands[1]);
-            printf("DEBUG: Line to (%g %g).\n", operands[0], operands[1]);
+            
+            if (g_verbose)
+              printf("DEBUG: Line to (%g %g).\n", operands[0], operands[1]);
           }
         }
         else if (!strcmp(token, "re"))
@@ -277,26 +307,34 @@ main( int argc,                       // I - Number of command-line args
           if  (num_operands == 4)
           {
             cairo_rectangle(cr, operands[0], operands[1], operands[2], operands[3]);
-            printf("DEBUG: Rectangle at (%g, %g) size (%g %g) \n", operands[0], operands[1], operands[2], operands[3]);
+
+            if (g_verbose)
+              printf("DEBUG: Rectangle at (%g, %g) size (%g %g) \n", operands[0], operands[1], operands[2], operands[3]);
           }
         }
         else if (!strcmp(token, "h"))
         {
           // CLose Path
           cairo_close_path(cr);
-          printf("DEBUG: Close path.\n");
+
+          if (g_verbose)
+            printf("DEBUG: Close path.\n");
         }
         else if (!strcmp(token, "S"))
         {
           // Stroke Path
           cairo_stroke(cr);
-          printf("DEBUG: Stroke path.\n");
+
+          if (g_verbose)
+            printf("DEBUG: Stroke path.\n");
         }
         else if (!strcmp(token, "f"))
         {
           // Fill path
           cairo_fill(cr);
-          printf("DEBUG:Fill Path.\n");
+
+          if (g_verbose)
+            printf("DEBUG:Fill Path.\n");
         }
 
         // Clear the operand stack for the next command
@@ -317,7 +355,9 @@ main( int argc,                       // I - Number of command-line args
   }
   else
   {
-    printf("Wrote blank page to '%s'.\n", argv[2]);
+
+    if (g_verbose)
+      printf("Wrote blank page to '%s'.\n", argv[2]);
   }
 
   //Clean up..
