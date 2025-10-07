@@ -73,8 +73,9 @@ main( int argc,                       // I - Number of command-line args
   char *output_filename = NULL;
   int opt;
   int pagenum = 1;
+  int dpi = 72;
 
-  while ((opt = getopt(argc, argv, "o:p:")) != -1 )
+  while ((opt = getopt(argc, argv, "o:p:r:")) != -1 )
   {
     switch (opt)
     {
@@ -84,6 +85,10 @@ main( int argc,                       // I - Number of command-line args
 
       case 'p':
         pagenum = atoi(optarg);
+          break;
+
+      case 'r':
+          dpi = atoi(optarg);
           break;
 
       default: /* '?' */
@@ -120,11 +125,14 @@ main( int argc,                       // I - Number of command-line args
   pdfioPageGetMediaBox(page, &mediabox);
   printf("Page 1 is %.2f wide and %.2f high.\n", mediabox.x2 - mediabox.x1, mediabox.y2-mediabox.y1);
 
+  double scale = dpi / 72.0;
 
   // Create a cairo surface and rendering context...
-  surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, (int)(mediabox.x2 - mediabox.x1), (int)(mediabox.y2 - mediabox.y1));
+  surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, (int)((mediabox.x2 - mediabox.x1) * scale ), (int)((mediabox.y2 - mediabox.y1) * scale ));
   cr  = cairo_create(surface);
   
+  cairo_scale(cr, scale, scale);
+
   // Flip the coordinate system to match PDF (origin at bottom-left)
   cairo_translate(cr, 0, mediabox.y2 - mediabox.y1);
   cairo_scale(cr, 1.0, -1.0);

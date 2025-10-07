@@ -272,7 +272,7 @@ do_renderer_tests(void)
 
   // Test 3: Nested state box
   testBegin("./examples/pdf2cairo 03_nested_state.pdf");
-  if (system("./examples/pdf2cairo -p 1 testfiles/renderer/03_nested_state.pdf -o testfiles/renderer-output/03.png") != 0)
+  if (system("./examples/pdf2cairo -r 300 -p 1 testfiles/renderer/03_nested_state.pdf -o testfiles/renderer-output/03.png") != 0)
   {
     testEnd(false);
     status = 1;
