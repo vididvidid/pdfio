@@ -291,6 +291,17 @@ do_renderer_tests(void)
     testEnd(true);
 
 
+  // Test 5: Cubic Bezier Curve
+  testBegin("./examples/pdf2cairo 04_Cubic_Bezier_Curve.pdf");
+  if (system("./examples/pdf2cairo -v -p 1 testfiles/renderer/04_Cubic_Bezier_Curve.pdf -o testfiles/renderer-output/04.png") != 0)
+  {
+    testEnd(false);
+    status = 1;
+  }
+  else
+    testEnd(true);
+
+
   puts("--- Renderer tests finished. Check PNG files in testfiles/renderer-output/ ---\n");
 
   return (status);

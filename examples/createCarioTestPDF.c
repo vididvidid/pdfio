@@ -54,26 +54,24 @@ int main(int argc, char *argv[])
   }
 
   // 4. Write PDF commands to draw the nested boxes
-  // Start with the outer box
-  pdfioStreamPrintf(page_stream, "q\n");                                   // Save initial graphics state
-  pdfioStreamPrintf(page_stream, "%.2f %.2f %.2f rg\n",
-                    outer_r, outer_g, outer_b);                            // Set fill color to gray
-  pdfioStreamPrintf(page_stream, "%.2f %.2f %.2f %.2f re\n",
-                    outer_x, outer_y, outer_w, outer_h);                   // Define outer rectangle
-  pdfioStreamPrintf(page_stream, "f\n");                                   // Fill it
+  pdfioStreamPrintf(page_stream, "q\n");              // Save graphics state
 
-  // Now, draw the inner box in a nested state
-  pdfioStreamPrintf(page_stream, "q\n");                                   // Save current state (gray fill is active)
-  pdfioStreamPrintf(page_stream, "%.2f w\n", line_width);                 // Set line width to 4 points
-  pdfioStreamPrintf(page_stream, "%.2f %.2f %.2f RG\n",
-                    inner_r, inner_g, inner_b);                            // Set STROKE color to red ('RG' is for stroke)
-  pdfioStreamPrintf(page_stream, "%.2f %.2f %.2f %.2f re\n",
-                    inner_x, inner_y, inner_w, inner_h);                   // Define inner rectangle
-  pdfioStreamPrintf(page_stream, "S\n");                                   // Stroke it
-  pdfioStreamPrintf(page_stream, "Q\n");                                   // Restore state (removes red stroke color and line width)
+  pdfioStreamPrintf(page_stream, "3 w\n");              // Set line width to 3 points
+  pdfioStreamPrintf(page_stream, "1 0 0 RG\n");         // Set stroke color to red
 
-  pdfioStreamPrintf(page_stream, "Q\n");                                   // Restore initial state
+  // Define the path
+  pdfioStreamPrintf(page_stream, "100 600 m\n");        // Move to start point (100, 600)
+  pdfioStreamPrintf(page_stream,
+                    "200 800 "     // Control Point 1 (x1, y1)
+                    "400 400 "     // Control Point 2 (x2, y2)
+                    "500 600 c\n");  // End Point (x3, y3) + curve operator
 
+  pdfioStreamPrintf(page_stream, "S\n");              // Stroke the path to make it visible
+
+  pdfioStreamPrintf(page_stream, "Q\n");              // Restore graphics state
+
+
+  
   // 5. Close and save the file
   pdfioStreamClose(page_stream);
   pdfioFileClose(pdf);

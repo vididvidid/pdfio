@@ -269,6 +269,18 @@ process_content_stream(cairo_t *cr, pdfio_stream_t *st)
               printf("DEBUG: Line to (%g %g).\n", operands[0], operands[1]);
         }
       }
+      else if (!strcmp(token, "c"))
+      {
+        // Curve to
+        if (num_operands == 6)
+        {
+          cairo_curve_to(cr, operands[0], operands[1], operands[2], operands[3],operands[4], operands[5]);
+
+          if (g_verbose)
+            printf("DEBUG: Curve to (%g, %g) with control points (%g, %g) and (%g, %g).\n", operands[4], operands[5], operands[0], operands[1], operands[2], operands[3]);
+      
+        }
+      }
       else if (!strcmp(token, "re"))
       {
         // Rectangle
