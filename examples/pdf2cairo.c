@@ -94,6 +94,10 @@ main( int argc,                       // I - Number of command-line args
   // Create a cairo surface and rendering context...
   surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, (int)(mediabox.x2 - mediabox.x1), (int)(mediabox.y2 - mediabox.y1));
   cr  = cairo_create(surface);
+  
+  // Flip the coordinate system to match PDF (origin at bottom-left)
+  cairo_translate(cr, 0, mediabox.y2 - mediabox.y1);
+  cairo_scale(cr, 1.0, -1.0);
 
   // Initialize the graphics state stack
   gstack[0].fill_rgb[0] = 0.0; // Black
