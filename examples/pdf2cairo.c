@@ -196,7 +196,7 @@ process_content_stream(cairo_t *cr, pdfio_stream_t *st)
           gstack[gstack_ptr].fill_rgb[0] = operands[0];
           gstack[gstack_ptr].fill_rgb[1] = operands[1];
           gstack[gstack_ptr].fill_rgb[2] = operands[2];
-          cairo_set_source_rgb(cr, operands[0], operands[1], operands[2]);
+          //cairo_set_source_rgb(cr, operands[0], operands[1], operands[2]);
 
           if (g_verbose)
             printf("DEBUG: Set fill color to %g %g %g \n", operands[0], operands[1], operands[2]);
@@ -210,7 +210,7 @@ process_content_stream(cairo_t *cr, pdfio_stream_t *st)
           gstack[gstack_ptr].stroke_rgb[0] = operands[0];
           gstack[gstack_ptr].stroke_rgb[1] = operands[1];
           gstack[gstack_ptr].stroke_rgb[2] = operands[2];
-          cairo_set_source_rgb(cr, operands[0], operands[1], operands[2]);
+          //cairo_set_source_rgb(cr, operands[0], operands[1], operands[2]);
 
           if (g_verbose)
             printf("DEBUG: Set stroke color to %g %g %g \n", operands[0], operands[1], operands[2]);
@@ -225,7 +225,7 @@ process_content_stream(cairo_t *cr, pdfio_stream_t *st)
           gstack[gstack_ptr].fill_rgb[0] = operands[0];
           gstack[gstack_ptr].fill_rgb[1] = operands[0];
           gstack[gstack_ptr].fill_rgb[2] = operands[0];
-          cairo_set_source_rgb(cr, operands[0], operands[0], operands[0]);
+          //cairo_set_source_rgb(cr, operands[0], operands[0], operands[0]);
 
           if (g_verbose)
             printf("DEBUG: Set fill color to gray %g\n", operands[0]);
@@ -241,7 +241,7 @@ process_content_stream(cairo_t *cr, pdfio_stream_t *st)
           gstack[gstack_ptr].stroke_rgb[2] = operands[0];
 
           // To set a gray color in Cairo, you set R, G, and B to the same value.
-          cairo_set_source_rgb(cr, operands[0], operands[0], operands[0]);
+          //cairo_set_source_rgb(cr, operands[0], operands[0], operands[0]);
 
           if (g_verbose)
             printf("DEBUG: Set stroke color to gray %g \n", operands[0]);
@@ -329,6 +329,7 @@ process_content_stream(cairo_t *cr, pdfio_stream_t *st)
       else if (!strcmp(token, "S"))
       {
         // Stroke Path
+        cairo_set_source_rgb(cr, gstack[gstack_ptr].stroke_rgb[0], gstack[gstack_ptr].stroke_rgb[1], gstack[gstack_ptr].stroke_rgb[2]);
         cairo_stroke(cr);
 
         if (g_verbose)
@@ -337,6 +338,7 @@ process_content_stream(cairo_t *cr, pdfio_stream_t *st)
       else if (!strcmp(token, "f"))
       {
         // Fill Path
+        cairo_set_source_rgb(cr, gstack[gstack_ptr].fill_rgb[0], gstack[gstack_ptr].fill_rgb[1], gstack[gstack_ptr].fill_rgb[2]);
         cairo_fill(cr);
 
         if (g_verbose)
@@ -368,6 +370,7 @@ process_content_stream(cairo_t *cr, pdfio_stream_t *st)
       else if (!strcmp(token, "f*"))
       {
         // Fill Path (Even-Odd)
+        cairo_set_source_rgb(cr, gstack[gstack_ptr].fill_rgb[0], gstack[gstack_ptr].fill_rgb[1], gstack[gstack_ptr].fill_rgb[2]);
         cairo_set_fill_rule(cr, CAIRO_FILL_RULE_EVEN_ODD);
         cairo_fill(cr);
         cairo_set_fill_rule(cr, CAIRO_FILL_RULE_WINDING);
@@ -401,6 +404,32 @@ process_content_stream(cairo_t *cr, pdfio_stream_t *st)
 
             if (g_verbose)
               printf("DEBUG: Close, fill and stroke path with even -odd rule ('b*).\n");
+        }
+        else if (!strcmp(token, "n"))
+        {
+          // End path without filling or stroking (new path)
+          cairo_new_path(cr);
+
+          if (g_verbose)
+            printf("DEBUG: New path ('n').\n");
+        }
+        else if (!strcmp(token, "W*"))
+        {
+          // Set the clipping path using the even-odd rule
+          cairo_set_fill_rule(cr, CAIRO_FILL_RULE_EVEN_ODD);
+          cairo_clip(cr);
+          cairo_set_fill_rule(cr, CAIRO_FILL_RULE_WINDING);
+
+          if (g_verbose)
+            printf("DEBUG: Set clipping path with even-odd rule ('W*').\n");
+        }
+        else if (!strcmp(token, "W"))
+        {
+          cairo_set_fill_rule(cr, CAIRO_FILL_RULE_WINDING);
+          cairo_clip(cr);
+
+          if (g_verbose)
+            printf("DEBUG: Set clipping path with non-zero winding rule ('W').\n");
         }
 
 
