@@ -53,26 +53,22 @@ int main(int argc, char *argv[])
     return (1);
   }
 
-  // 4. Write PDF commands to draw the nested boxes
-pdfioStreamPrintf(page_stream, "q\n");                // Save graphics state
+ // 4. Write PDF commands to draw a filled and stroked rectangle
+  pdfioStreamPrintf(page_stream, "q\n");                // Save graphics state
 
-  pdfioStreamPrintf(page_stream, "4 w\n");                // Set line width to 4 points
-  pdfioStreamPrintf(page_stream, "0 0.5 0 RG\n");         // Set stroke color to a dark green
+  pdfioStreamPrintf(page_stream, "8 w\n");                // Set a thick line width
+  pdfioStreamPrintf(page_stream, "0 0 0.8 RG\n");         // Set stroke color to dark blue
+  pdfioStreamPrintf(page_stream, "0.7 0.9 1 rg\n");       // Set fill color to light blue
 
-  // Define the path using 'v' and 'y'
-  pdfioStreamPrintf(page_stream, "100 500 m\n");          // Move to start point (100, 500)
-  pdfioStreamPrintf(page_stream,
-                    "200 700 "       // Control Point 2 (x2, y2)
-                    "300 500 v\n");    // End Point (x3, y3) + 'v' operator
+  // Define a rectangle
+  pdfioStreamPrintf(page_stream, "150 400 312 200 re\n");
 
-  pdfioStreamPrintf(page_stream,
-                    "400 300 "       // Control Point 1 (x1, y1)
-                    "500 500 y\n");    // End Point (x3, y3) + 'y' operator
-
-  pdfioStreamPrintf(page_stream, "S\n");                // Stroke the path
+  // Fill and stroke the path in one command
+  pdfioStreamPrintf(page_stream, "B\n");
 
   pdfioStreamPrintf(page_stream, "Q\n");                // Restore graphics state
-  
+
+
   // 5. Close and save the file
   pdfioStreamClose(page_stream);
   pdfioFileClose(pdf);

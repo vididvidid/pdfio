@@ -342,6 +342,30 @@ process_content_stream(cairo_t *cr, pdfio_stream_t *st)
         if (g_verbose)
           printf("DEBUG: Fill Path.\n");
       }
+      else if (!strcmp(token, "B"))
+      {
+        // Fill and then stroke the path
+        cairo_set_source_rgb(cr, gstack[gstack_ptr].fill_rgb[0],gstack[gstack_ptr].fill_rgb[1], gstack[gstack_ptr].fill_rgb[2]);
+        cairo_fill_preserve(cr);
+        cairo_set_source_rgb(cr, gstack[gstack_ptr].stroke_rgb[0],gstack[gstack_ptr].stroke_rgb[1],gstack[gstack_ptr].stroke_rgb[2]);
+        cairo_stroke(cr);
+
+        if (g_verbose)
+          printf("DEBUG: Fill and stroke path ('B').\n");
+      }
+      else if (!strcmp(token, "b"))
+      {
+        // Close, fill, and then stroke the path
+        cairo_close_path(cr);
+        cairo_set_source_rgb(cr, gstack[gstack_ptr].fill_rgb[0], gstack[gstack_ptr].fill_rgb[1], gstack[gstack_ptr].fill_rgb[2]);
+        cairo_fill_preserve(cr);
+        cairo_set_source_rgb(cr, gstack[gstack_ptr].stroke_rgb[0],gstack[gstack_ptr].stroke_rgb[1], gstack[gstack_ptr].stroke_rgb[2]);
+        cairo_stroke(cr);
+
+        if (g_verbose)
+          printf("DEBUG: Close, fill, and stroke path ('b').\n");
+      }
+
 
       // Clear the operand stack for the next command
       num_operands = 0;
