@@ -302,6 +302,17 @@ do_renderer_tests(void)
     testEnd(true);
 
 
+  // Test 6: Curves
+  testBegin("./examples/pdf2cairo 05_Curves.pdf");
+  if (system("./examples/pdf2cairo -v -p 1 testfiles/renderer/05_Curves.pdf -o testfiles/renderer-output/05.png") != 0)
+  {
+    testEnd(false);
+    status = 1;
+  }
+  else
+    testEnd(true);
+
+
   puts("--- Renderer tests finished. Check PNG files in testfiles/renderer-output/ ---\n");
 
   return (status);

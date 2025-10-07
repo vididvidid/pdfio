@@ -281,6 +281,32 @@ process_content_stream(cairo_t *cr, pdfio_stream_t *st)
       
         }
       }
+      else if (!strcmp(token,"v"))
+      {
+        // Curve to (initial point replicated)
+        if (num_operands == 4)
+        {
+          double curr_x, curr_y;
+          cairo_get_current_point (cr, &curr_x, &curr_y);
+          cairo_curve_to(cr, curr_x, curr_y, operands[0], operands[1], operands[2], operands[3]);
+
+          if (g_verbose)
+            printf("DEBUG: Curve 'v' to (%g, %g) with control points (%g, %g) and (%g, %g).\n", operands[2], operands[3], curr_x, curr_y, operands[0], operands[1]);
+        }
+      }
+      else if (!strcmp(token, "y"))
+      {
+        // Curve to (final point replicated)
+        if (num_operands == 4)
+        {
+          double curr_x, curr_y;
+          cairo_get_current_point(cr, &curr_x, &curr_y);
+          cairo_curve_to(cr, operands[0], operands[1], operands[2], operands[3], operands[2], operands[3]);
+
+          if (g_verbose)
+            printf("DEBUG: Curve 'y' to (%g, %g) with control points (%g, %g) and (%g, %g). \n", operands[2], operands[2], operands[0], operands[1], operands[2], operands[3]);
+        }
+      }
       else if (!strcmp(token, "re"))
       {
         // Rectangle
