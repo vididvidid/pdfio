@@ -324,10 +324,25 @@ do_renderer_tests(void)
   else
     testEnd(true);
 
+
+  // Test 8: Shapes with holes
+  testBegin("./examples/pdf2cairo 07_shape_with_holes.pdf");
+  if (system("./examples/pdf2cairo -v -p 1 testfiles/renderer/07_shape_with_holes.pdf -o testfiles/renderer-output/07.png") != 0)
+  {
+    testEnd(false);
+    status = 1;
+  }
+  else
+    testEnd(true);
+
+
   puts("--- Renderer tests finished. Check PNG files in testfiles/renderer-output/ ---\n");
 
   return (status);
 }
+
+
+
 
 
 //

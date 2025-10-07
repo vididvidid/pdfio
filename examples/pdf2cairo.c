@@ -365,6 +365,44 @@ process_content_stream(cairo_t *cr, pdfio_stream_t *st)
         if (g_verbose)
           printf("DEBUG: Close, fill, and stroke path ('b').\n");
       }
+      else if (!strcmp(token, "f*"))
+      {
+        // Fill Path (Even-Odd)
+        cairo_set_fill_rule(cr, CAIRO_FILL_RULE_EVEN_ODD);
+        cairo_fill(cr);
+        cairo_set_fill_rule(cr, CAIRO_FILL_RULE_WINDING);
+
+        if (g_verbose)
+          printf("DEBUG: Fill Path with even-odd rule ('f*').\n");
+      }
+      else if (!strcmp(token, "B*"))
+      {
+        // Fill and then stroke the path (Even-Odd)
+        cairo_set_source_rgb(cr, gstack[gstack_ptr].fill_rgb[0], gstack[gstack_ptr].fill_rgb[1], gstack[gstack_ptr].fill_rgb[2]);
+        cairo_set_fill_rule(cr, CAIRO_FILL_RULE_EVEN_ODD);
+        cairo_fill_preserve(cr);
+        cairo_set_fill_rule(cr, CAIRO_FILL_RULE_WINDING);
+        cairo_set_source_rgb(cr, gstack[gstack_ptr].stroke_rgb[0], gstack[gstack_ptr].stroke_rgb[1], gstack[gstack_ptr].stroke_rgb[2]);
+        cairo_stroke(cr);
+
+        if (g_verbose)
+          printf("DEBUG: fill and stroke path with even-odd rule ('B*').\n");
+      }
+      else if (!strcmp(token, "b*"))
+      {
+        // Close, fill, and then stroke the path (Even-Odd)
+        cairo_close_path(cr);
+        cairo_set_source_rgb(cr, gstack[gstack_ptr].fill_rgb[0], gstack[gstack_ptr].fill_rgb[1], gstack[gstack_ptr].fill_rgb[2]);
+            cairo_set_fill_rule(cr, CAIRO_FILL_RULE_EVEN_ODD);
+            cairo_fill_preserve(cr);
+            cairo_set_fill_rule(cr, CAIRO_FILL_RULE_WINDING); 
+            cairo_set_source_rgb(cr, gstack[gstack_ptr].stroke_rgb[0], gstack[gstack_ptr].stroke_rgb[1], gstack[gstack_ptr].stroke_rgb[2]);
+            cairo_stroke(cr);
+
+            if (g_verbose)
+              printf("DEBUG: Close, fill and stroke path with even -odd rule ('b*).\n");
+        }
+
 
 
       // Clear the operand stack for the next command

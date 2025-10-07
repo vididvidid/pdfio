@@ -17,25 +17,6 @@ int main(int argc, char *argv[])
   // Page and box dimensions
   pdfio_rect_t media_box = {0.0, 0.0, 612.0, 792.0};
 
-  // Outer filled box
-  const double outer_x = 100.0;
-  const double outer_y = 100.0;
-  const double outer_w = 412.0;
-  const double outer_h = 692.0;
-  const double outer_r = 0.8; // Gray
-  const double outer_g = 0.8;
-  const double outer_b = 0.8;
-
-  // Inner stroked box
-  const double inner_x = 150.0;
-  const double inner_y = 150.0;
-  const double inner_w = 312.0;
-  const double inner_h = 592.0;
-  const double inner_r = 1.0; // Red
-  const double inner_g = 0.0;
-  const double inner_b = 0.0;
-  const double line_width = 4.0;
-
   // 2. Create the PDF file
   pdfio_file_t *pdf = pdfioFileCreate(output_filename, NULL, &media_box, NULL, NULL, NULL);
   if (!pdf)
@@ -53,18 +34,30 @@ int main(int argc, char *argv[])
     return (1);
   }
 
- // 4. Write PDF commands to draw a filled and stroked rectangle
+// 4. Write PDF commands to draw a donut shape
   pdfioStreamPrintf(page_stream, "q\n");                // Save graphics state
+  pdfioStreamPrintf(page_stream, "0.8 0.1 0.1 rg\n");   // Set fill color to red
 
-  pdfioStreamPrintf(page_stream, "8 w\n");                // Set a thick line width
-  pdfioStreamPrintf(page_stream, "0 0 0.8 RG\n");         // Set stroke color to dark blue
-  pdfioStreamPrintf(page_stream, "0.7 0.9 1 rg\n");       // Set fill color to light blue
+  // The key to the even-odd rule is the path direction.
+  // We will draw the outer circle counter-clockwise and the inner circle clockwise.
 
-  // Define a rectangle
-  pdfioStreamPrintf(page_stream, "150 400 312 200 re\n");
+  // --- Outer Circle (Counter-Clockwise) ---
+  // A circle is drawn with four Bezier curves.
+  pdfioStreamPrintf(page_stream, "306 650 m\n"); // Move to top of outer circle
+  pdfioStreamPrintf(page_stream, "194 650 100 556 100 444 c\n"); // Top-left quadrant
+  pdfioStreamPrintf(page_stream, "100 332 194 238 306 238 c\n"); // Bottom-left quadrant
+  pdfioStreamPrintf(page_stream, "418 238 512 332 512 444 c\n"); // Bottom-right quadrant
+  pdfioStreamPrintf(page_stream, "512 556 418 650 306 650 c\n"); // Top-right quadrant
 
-  // Fill and stroke the path in one command
-  pdfioStreamPrintf(page_stream, "B\n");
+  // --- Inner Circle (Clockwise) ---
+  pdfioStreamPrintf(page_stream, "306 550 m\n"); // Move to top of inner circle
+  pdfioStreamPrintf(page_stream, "362 550 406 506 406 450 c\n"); // Top-right quadrant
+  pdfioStreamPrintf(page_stream, "406 394 362 350 306 350 c\n"); // Bottom-right quadrant
+  pdfioStreamPrintf(page_stream, "250 350 206 394 206 450 c\n"); // Bottom-left quadrant
+  pdfioStreamPrintf(page_stream, "206 506 250 550 306 550 c\n"); // Top-left quadrant
+
+  // Use the even-odd fill operator 'f*' to create the hole
+  pdfioStreamPrintf(page_stream, "f*\n");
 
   pdfioStreamPrintf(page_stream, "Q\n");                // Restore graphics state
 
