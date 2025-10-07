@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <unistd.h>
+
 // -- Graphics State Structure --
 typedef struct
 {
@@ -67,15 +69,37 @@ main( int argc,                       // I - Number of command-line args
   cairo_surface_t *surface;
   cairo_t         *cr;
   int           status = 0;
+  char *input_filename = NULL;
+  char *output_filename = NULL;
+  int opt;
 
-  if (argc != 3)
+  while ((opt = getopt(argc, argv, "o:")) != -1 )
   {
-    puts("Usage: ./pdf2cairo input.pdf output.png");
+    switch (opt)
+    {
+      case 'o': 
+        output_filename = optarg;
+        break;
+      default: /* '?' */
+        fprintf(stderr, "Usage: %s [-o output.png] input.pdf\n", argv[0]);
+        return (1);
+    }
+  }
+
+  if (optind < argc )
+  {
+    input_filename = argv[optind];
+  }
+
+  if (input_filename == NULL || output_filename == NULL)
+  {
+    fprintf(stderr, "Usage: %s [-o output.png] input.pdf\n", argv[0]);
     return (1);
   }
 
+
   // Open the PDF file
-  if ((pdf = pdfioFileOpen(argv[1], NULL, NULL, NULL, NULL)) == NULL)
+  if ((pdf = pdfioFileOpen(input_filename, NULL, NULL, NULL, NULL)) == NULL)
     return (1);
 
   // Get the first Page...
@@ -272,7 +296,7 @@ main( int argc,                       // I - Number of command-line args
 
 
   // Save to PNG..
-  if (cairo_surface_write_to_png(surface, argv[2]) != CAIRO_STATUS_SUCCESS)
+  if (cairo_surface_write_to_png(surface, output_filename) != CAIRO_STATUS_SUCCESS)
   {
     fprintf(stderr, "Unable to write to '%s'.\n", argv[2]);
     status = 1;
