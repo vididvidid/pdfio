@@ -64,6 +64,190 @@ pop_gstate(cairo_t *cr)
   }
 }
 
+//
+// 'process_content_stream()' - Process the content stream for a page
+//
+static void
+process_content_stream(cairo_t *cr, pdfio_stream_t *st)
+{
+  char token[1024]; // Token from stream
+
+  puts("\n---- Executing Page 1 Content Stream ---");
+  while (pdfioStreamGetToken(st, token, sizeof(token)))
+  {
+    if (isdigit(token[0]) || token[0] == '.' || token[0] == '-')
+    {
+      // We have a number, push it on the operand stack
+      if (num_operands < MAX_OPERANDS)
+        operands[num_operands++] = atof(token);
+    }
+    else
+    {
+      // We have a command, process it...
+      if (g_verbose)
+        printf("DEBUG: Executing command '%s' with '%d' operands. \n", token, num_operands);
+      if (!strcmp(token, "q"))
+      {
+        // Save graphics State
+        push_gstate(cr);
+      }
+      else if (!strcmp(token, "Q"))
+      {
+        // Restore graphics state
+        pop_gstate(cr);
+      }
+      else if (!strcmp(token, "cm"))
+      {
+        // Concatenate matrix
+        if (num_operands == 6)
+        {
+          cairo_matrix_t matrix;
+          cairo_matrix_init(&matrix, operands[0], operands[1], operands[2],operands[3], operands[4], operands[5]);
+          cairo_transform(cr, &matrix);
+
+          if (g_verbose)
+            printf("DEBUG: Concatenate matrix [%g %g %g %g %g %g].\n", operands[0], operands[1], operands[2], operands[3], operands[4], operands[5]);
+        }
+      }
+      else if (!strcmp(token, "w"))
+      {
+        // Set line width
+        if (num_operands == 1)
+        {
+          gstack[gstack_ptr].line_width = operands[0];
+          cairo_set_line_width(cr, operands[0]);
+
+          if (g_verbose)
+            printf("DEBUG: Set line width to %g. \n",operands[0]);
+        }
+      }
+      else if (!strcmp(token, "rg"))
+      {
+        // Set fill Color (RGB)
+        if (num_operands == 3)
+        {
+          gstack[gstack_ptr].fill_rgb[0] = operands[0];
+          gstack[gstack_ptr].fill_rgb[1] = operands[1];
+          gstack[gstack_ptr].fill_rgb[2] = operands[2];
+          cairo_set_source_rgb(cr, operands[0], operands[1], operands[2]);
+
+          if (g_verbose)
+            printf("DEBUG: Set fill color to %g %g %g \n", operands[0], operands[1], operands[2]);
+        }
+      }
+      else if (!strcmp(token, "RG"))
+      {
+        // Set Stroke Color (RGB)
+        if (num_operands == 3)
+        {
+          gstack[gstack_ptr].stroke_rgb[0] = operands[0];
+          gstack[gstack_ptr].stroke_rgb[1] = operands[1];
+          gstack[gstack_ptr].stroke_rgb[2] = operands[2];
+          cairo_set_source_rgb(cr, operands[0], operands[1], operands[2]);
+
+          if (g_verbose)
+            printf("DEBUG: Set stroke color to %g %g %g \n", operands[0], operands[1], operands[2]);
+
+        }
+      }
+      else if (!strcmp(token, "g"))
+      {
+        // Set fill Color (GrayScale)
+        if (num_operands == 1)
+        {
+          gstack[gstack_ptr].fill_rgb[0] = operands[0];
+          gstack[gstack_ptr].fill_rgb[1] = operands[0];
+          gstack[gstack_ptr].fill_rgb[2] = operands[0];
+          cairo_set_source_rgb(cr, operands[0], operands[0], operands[0]);
+
+          if (g_verbose)
+            printf("DEBUG: Set fill color to gray %g\n", operands[0]);
+        }
+      }
+      else if (!strcmp(token, "G"))
+      {
+        // Set Stroke Color (GrayScale)
+        if (num_operands == 1)
+        {
+          gstack[gstack_ptr].stroke_rgb[0] = operands[0];
+          gstack[gstack_ptr].stroke_rgb[1] = operands[0];
+          gstack[gstack_ptr].stroke_rgb[2] = operands[0];
+
+          // To set a gray color in Cairo, you set R, G, and B to the same value.
+          cairo_set_source_rgb(cr, operands[0], operands[0], operands[0]);
+
+          if (g_verbose)
+            printf("DEBUG: Set stroke color to gray %g \n", operands[0]);
+        }
+      }
+      else if (!strcmp(token, "m"))
+      {
+        // Move to 
+        if (num_operands == 2)
+        {
+          cairo_move_to(cr, operands[0], operands[1]);
+
+          if (g_verbose)
+            printf("DEBUG: Move to (%g, %g). \n", operands[0], operands[1]);
+        }
+      }
+      else if (!strcmp(token, "l"))
+      {
+        // Line to
+        if (num_operands == 2)
+        {
+          cairo_line_to(cr, operands[0], operands[1]);
+
+          if (g_verbose)
+              printf("DEBUG: Line to (%g %g).\n", operands[0], operands[1]);
+        }
+      }
+      else if (!strcmp(token, "re"))
+      {
+        // Rectangle
+        if (num_operands == 4)
+        {
+          cairo_rectangle(cr, operands[0], operands[1], operands[2], operands[3]);
+
+          if (g_verbose)
+            printf("DEBUG: Rectangle at (%g, %g) size (%g %g) \n", operands[0],operands[1], operands[2], operands[3]);
+        }
+      }
+      else if (!strcmp(token, "h"))
+      {
+        // Close Path
+        cairo_close_path(cr);
+
+        if (g_verbose)
+          printf("DEBUG: Close path.\n");
+      }
+      else if (!strcmp(token, "S"))
+      {
+        // Stroke Path
+        cairo_stroke(cr);
+
+        if (g_verbose)
+          printf("DEBUG: Stroke Path.\n");
+      }
+      else if (!strcmp(token, "f"))
+      {
+        // Fill Path
+        cairo_fill(cr);
+
+        if (g_verbose)
+          printf("DEBUG: Fill Path.\n");
+      }
+
+      // Clear the operand stack for the next command
+      num_operands = 0;
+    }
+  }
+  puts("--- End of Content Stream -- \n");
+}
+
+
+
+
 
 int                                   // 0 - Exit Status
 main( int argc,                       // I - Number of command-line args
@@ -171,177 +355,7 @@ main( int argc,                       // I - Number of command-line args
 
   if (st)
   {
-    char token[1024]; // Token from stream
-
-    puts("\n---- Executing Page 1 Content Stream ---");
-    while (pdfioStreamGetToken(st, token, sizeof(token)))
-    {
-      if (isdigit(token[0]) || token[0] == '.' || token[0] == '-')
-      {
-        // We have a number, push it on the operand stack
-        if (num_operands < MAX_OPERANDS)
-          operands[num_operands++] = atof(token);
-      }
-      else
-      {
-        // We have a command, process it...
-        if (g_verbose)
-          printf("DEBUG: Executing command '%s' with '%d' operands. \n", token, num_operands);
-        if (!strcmp(token, "q"))
-        {
-          // Save graphics state
-          push_gstate(cr);
-        }
-        else if (!strcmp(token, "Q"))
-        {
-          // Restore graphics state
-          pop_gstate(cr);
-        }
-        else if (!strcmp(token, "cm"))
-        {
-          //  Concatenate matrix
-          if (num_operands == 6)
-          {
-            cairo_matrix_t matrix;
-            cairo_matrix_init(&matrix, operands[0], operands[1], operands[2], operands[3], operands[4], operands[5]);
-            cairo_transform(cr, &matrix);
-
-            if (g_verbose)
-              printf("DEBUG: Contatenate matrix [%g %g %g %g %g %g].\n", operands[0], operands[1], operands[2], operands[3], operands[4], operands[5]);
-          }
-        }
-        else if (!strcmp(token, "w"))
-        {
-          // Set line width
-          if (num_operands == 1)
-          {
-            gstack[gstack_ptr].line_width = operands[0];
-            cairo_set_line_width(cr, operands[0]);
-            
-            if (g_verbose)
-              printf("DEBUG: Set line width to %g.\n",operands[0]);
-          }
-        }
-        else if (!strcmp(token, "rg"))
-        {
-          // Set fill Color (RGB)
-          if (num_operands == 3)
-          {
-            gstack[gstack_ptr].fill_rgb[0] = operands[0];
-            gstack[gstack_ptr].fill_rgb[1] = operands[1];
-            gstack[gstack_ptr].fill_rgb[2] = operands[2];
-            cairo_set_source_rgb(cr, operands[0], operands[1], operands[2]);
-
-            if (g_verbose)
-              printf("DEBUG: Set fill color to %g %g %g \n", operands[0], operands[1], operands[2]);
-          }
-        }
-        else if (!strcmp(token, "RG"))
-        {
-          // Set Stroke Color (RGB)
-          if (num_operands == 3)
-          {
-            gstack[gstack_ptr].stroke_rgb[0] = operands[0];
-            gstack[gstack_ptr].stroke_rgb[1] = operands[1];
-            gstack[gstack_ptr].stroke_rgb[2] = operands[2];
-            cairo_set_source_rgb(cr, operands[0], operands[1], operands[2]);
-
-            if (g_verbose)
-              printf("DEBUG: Set stroke color to %g %g %g \n", operands[0], operands[1], operands[2]);
-          }
-        }
-        else if (!strcmp(token, "g"))
-        {
-          // Set fill Color (Grayscale)
-          if (num_operands == 1)
-          {
-            gstack[gstack_ptr].fill_rgb[0] = operands[0];
-            gstack[gstack_ptr].fill_rgb[1] = operands[0];
-            gstack[gstack_ptr].fill_rgb[2] = operands[0];
-            cairo_set_source_rgb(cr, operands[0], operands[0], operands[0]);
-
-            if (g_verbose)
-              printf("DEBUG: Set fill color to gray %g\n", operands[0]);
-          }
-        }
-        else if (!strcmp(token, "G"))
-        {
-          // Set Stroke Color (Grayscale)
-          if (num_operands == 1)
-          {
-            gstack[gstack_ptr].stroke_rgb[0] = operands[0];
-            gstack[gstack_ptr].stroke_rgb[1] = operands[0];
-            gstack[gstack_ptr].stroke_rgb[2] = operands[0];
-            // To set a gray color in Cairo, you set R, G, and B to the same value.
-            cairo_set_source_rgb(cr, operands[0], operands[0], operands[0]);
-            
-            if (g_verbose)
-              printf("DEBUG: Set stroke color to gray %g\n", operands[0]);
-          }
-        }
-        else if (!strcmp(token, "m"))
-        {
-          //Move to 
-          if (num_operands == 2)
-          {
-            cairo_move_to(cr, operands[0], operands[1]);
-
-            if (g_verbose)
-              printf("DEBUG: Move to (%g, %g). \n", operands[0], operands[1]);
-          }
-        }
-        else if (!strcmp(token, "l"))
-        {
-          // Line to
-          if (num_operands == 2)
-          {
-            cairo_line_to(cr, operands[0], operands[1]);
-            
-            if (g_verbose)
-              printf("DEBUG: Line to (%g %g).\n", operands[0], operands[1]);
-          }
-        }
-        else if (!strcmp(token, "re"))
-        {
-          // REctangle
-          if  (num_operands == 4)
-          {
-            cairo_rectangle(cr, operands[0], operands[1], operands[2], operands[3]);
-
-            if (g_verbose)
-              printf("DEBUG: Rectangle at (%g, %g) size (%g %g) \n", operands[0], operands[1], operands[2], operands[3]);
-          }
-        }
-        else if (!strcmp(token, "h"))
-        {
-          // CLose Path
-          cairo_close_path(cr);
-
-          if (g_verbose)
-            printf("DEBUG: Close path.\n");
-        }
-        else if (!strcmp(token, "S"))
-        {
-          // Stroke Path
-          cairo_stroke(cr);
-
-          if (g_verbose)
-            printf("DEBUG: Stroke path.\n");
-        }
-        else if (!strcmp(token, "f"))
-        {
-          // Fill path
-          cairo_fill(cr);
-
-          if (g_verbose)
-            printf("DEBUG:Fill Path.\n");
-        }
-
-        // Clear the operand stack for the next command
-        num_operands =0;
-      }
-    }
-    puts("--- End of Content Stream ---\n");
+    process_content_stream(cr, st);
     pdfioStreamClose(st);
   }
 
