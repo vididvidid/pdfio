@@ -431,6 +431,11 @@ process_content_stream(cairo_t *cr, pdfio_stream_t *st,pdfio_obj_t *resources)
           if (g_verbose)
             printf("DEBUG: Set clipping path with non-zero winding rule ('W').\n");
         }
+        else if (!strcmp(token, "gs"))
+        {
+          if (g_verbose)
+            printf("DEBUG: gs token came, implementation will be later");
+        }
 
 
 
