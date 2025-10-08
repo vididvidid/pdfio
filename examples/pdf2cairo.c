@@ -135,7 +135,7 @@ analyze_content_stream(pdfio_stream_t *st)
 // 'process_content_stream()' - Process the content stream for a page
 //
 static void
-process_content_stream(cairo_t *cr, pdfio_stream_t *st)
+process_content_stream(cairo_t *cr, pdfio_stream_t *st,pdfio_obj_t *resources)
 {
   char token[1024]; // Token from stream
 
@@ -532,6 +532,17 @@ main( int argc,                       // I - Number of command-line args
   // Get the page size....
   pdfioPageGetMediaBox(page, &mediabox);
 
+  pdfio_dict_t *page_dict = pdfioObjGetDict(page);
+  pdfio_obj_t *resources = NULL;
+  if (page_dict)
+    resources = pdfioDictGetObj(page_dict, "Resources");
+  if (!resources)
+  {
+    fprintf(stderr, "ERROR: Unable to get page resources.\n");
+    // Consider cleanup and exit here
+  }
+
+
   if (g_verbose)
     printf("Page 1 is %.2f wide and %.2f high.\n", mediabox.x2 - mediabox.x1, mediabox.y2-mediabox.y1);
 
@@ -586,7 +597,7 @@ main( int argc,                       // I - Number of command-line args
 
     if (st)
     {
-      process_content_stream(cr, st);
+      process_content_stream(cr, st, resources);
     }
 
     // Save to PNG..

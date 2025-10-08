@@ -335,6 +335,176 @@ do_renderer_tests(void)
   else
     testEnd(true);
 
+  //Test : TestFilledBanners
+  testBegin("./examples/pdf2cairo TestFilledBanners.pdf");
+  if (system("./examples/pdf2cairo -v testfiles/renderer/TestFilledBanners.pdf -o testfiles/renderer-output/TestFilledBannersResult.png") != 0)
+  {
+    testEnd(false);
+    status = 1;
+  }
+  else
+    testEnd(true);
+
+  //Test : TestFilledBasicShapesPart1
+  testBegin("./examples/pdf2cairo TestFilledBasicShapesPart1.pdf");
+  if (system("./examples/pdf2cairo -v testfiles/renderer/TestFilledBasicShapesPart1.pdf -o testfiles/renderer-output/TestFilledBasicShapesPart1Result.png") != 0)
+  {
+    testEnd(false);
+    status = 1;
+  }
+  else
+    testEnd(true);
+
+  //Test : TestFilledBasicShapesPart2
+  testBegin("./examples/pdf2cairo TestFilledBasicShapesPart2.pdf");
+  if (system("./examples/pdf2cairo -v testfiles/renderer/TestFilledBasicShapesPart2.pdf -o testfiles/renderer-output/TestFilledBasicShapesPart2Result.png") != 0)
+  {
+    testEnd(false);
+    status = 1;
+  }
+  else
+    testEnd(true);
+
+  //Test : TestFilledBlockArrows
+  testBegin("./examples/pdf2cairo TestFilledBlockArrows.pdf");
+  if (system("./examples/pdf2cairo -v testfiles/renderer/TestFilledBlockArrows.pdf -o testfiles/renderer-output/TestFilledBlockArrowsResult.png") != 0)
+  {
+    testEnd(false);
+    status = 1;
+  }
+  else
+    testEnd(true);
+
+  //Test : TestFilledEquationShapes
+  testBegin("./examples/pdf2cairo TestFilledEquationShapes.pdf");
+  if (system("./examples/pdf2cairo -v testfiles/renderer/TestFilledEquationShapes.pdf -o testfiles/renderer-output/TestFilledEquationShapesResult.png") != 0)
+  {
+    testEnd(false);
+    status = 1;
+  }
+  else
+    testEnd(true);
+
+  //Test : TestFilledFlowChart
+  testBegin("./examples/pdf2cairo TestFilledFlowChart.pdf");
+  if (system("./examples/pdf2cairo -v testfiles/renderer/TestFilledFlowChart.pdf -o testfiles/renderer-output/TestFilledFlowChartResult.png") != 0)
+  {
+    testEnd(false);
+    status = 1;
+  }
+  else
+    testEnd(true);
+
+  //Test : TestFilledRectangles
+  testBegin("./examples/pdf2cairo TestFilledRectangles.pdf");
+  if (system("./examples/pdf2cairo -v testfiles/renderer/TestFilledRectangles.pdf -o testfiles/renderer-output/TestFilledRectanglesResult.png") != 0)
+  {
+    testEnd(false);
+    status = 1;
+  }
+  else
+    testEnd(true);
+
+  //Test : TestFilledStars
+  testBegin("./examples/pdf2cairo TestFilledStars.pdf");
+  if (system("./examples/pdf2cairo -v testfiles/renderer/TestFilledStars.pdf -o testfiles/renderer-output/TestFilledStarsResult.png") != 0)
+  {
+    testEnd(false);
+    status = 1;
+  }
+  else
+    testEnd(true);
+
+  //Test : TestStrokedBanners
+  testBegin("./examples/pdf2cairo TestStrokedBanners.pdf");
+  if (system("./examples/pdf2cairo -v testfiles/renderer/TestStrokedBanners.pdf -o testfiles/renderer-output/TestStrokedBannersResult.png") != 0)
+  {
+    testEnd(false);
+    status = 1;
+  }
+  else
+    testEnd(true);
+
+  //Test : TestStrokedBasicShapesPart1
+  testBegin("./examples/pdf2cairo TestStrokedBasicShapesPart1.pdf");
+  if (system("./examples/pdf2cairo -v testfiles/renderer/TestStrokedBasicShapesPart1.pdf -o testfiles/renderer-output/TestStrokedBasicShapesPart1Result.png") != 0)
+  {
+    testEnd(false);
+    status = 1;
+  }
+  else
+    testEnd(true);
+
+  //Test : TestStrokedBasicShapesPart2
+  testBegin("./examples/pdf2cairo TestStrokedBasicShapesPart2.pdf");
+  if (system("./examples/pdf2cairo -v testfiles/renderer/TestStrokedBasicShapesPart2.pdf -o testfiles/renderer-output/TestStrokedBasicShapesPart2Result.png") != 0)
+  {
+    testEnd(false);
+    status = 1;
+  }
+  else
+    testEnd(true);
+
+  //Test : TestStrokedBlockArrows
+  testBegin("./examples/pdf2cairo TestStrokedBlockArrows.pdf");
+  if (system("./examples/pdf2cairo -v testfiles/renderer/TestStrokedBlockArrows.pdf -o testfiles/renderer-output/TestStrokedBlockArrowsResult.png") != 0)
+  {
+    testEnd(false);
+    status = 1;
+  }
+  else
+    testEnd(true);
+
+  //Test : TestStrokedEquationShapes
+  testBegin("./examples/pdf2cairo TestStrokedEquationShapes.pdf");
+  if (system("./examples/pdf2cairo -v testfiles/renderer/TestStrokedEquationShapes.pdf -o testfiles/renderer-output/TestStrokedEquationShapesResult.png") != 0)
+  {
+    testEnd(false);
+    status = 1;
+  }
+  else
+    testEnd(true);
+
+  //Test : TestStrokedFlowChart
+  testBegin("./examples/pdf2cairo TestStrokedFlowChart.pdf");
+  if (system("./examples/pdf2cairo -v testfiles/renderer/TestStrokedFlowChart.pdf -o testfiles/renderer-output/TestStrokedFlowChartResult.png") != 0)
+  {
+    testEnd(false);
+    status = 1;
+  }
+  else
+    testEnd(true);
+
+  //Test : TestStrokedRectangles
+  testBegin("./examples/pdf2cairo TestStrokedRectangles.pdf");
+  if (system("./examples/pdf2cairo -v testfiles/renderer/TestStrokedRectangles.pdf -o testfiles/renderer-output/TestStrokedRectanglesResult.png") != 0)
+  {
+    testEnd(false);
+    status = 1;
+  }
+  else
+    testEnd(true);
+
+  //Test : TestStrokedStars
+  testBegin("./examples/pdf2cairo TestStrokedStars.pdf");
+  if (system("./examples/pdf2cairo -v testfiles/renderer/TestStrokedStars.pdf -o testfiles/renderer-output/TestStrokedStarsResult.png") != 0)
+  {
+    testEnd(false);
+    status = 1;
+  }
+  else
+    testEnd(true);
+
+  //Test : TestTables
+  testBegin("./examples/pdf2cairo TestTables.pdf");
+  if (system("./examples/pdf2cairo -v testfiles/renderer/TestTables.pdf -o testfiles/renderer-output/TestTablesResult.png") != 0)
+  {
+    testEnd(false);
+    status = 1;
+  }
+  else
+    testEnd(true);
+
 
   puts("--- Renderer tests finished. Check PNG files in testfiles/renderer-output/ ---\n");
 
