@@ -103,16 +103,18 @@ LIBOBJS		=	\
 			ttf.o
 OBJS		=	\
 			$(LIBOBJS) \
-			examples/pdf2cairo.o \
+			examples/pdfcairo/pdf2cairo_main.o \
 			examples/createCarioTestPDF.o \
 			testpdfio.o \
+			testpdf2cairo.o \
 			testttf.o
 TARGETS		=	\
 			$(LIBPDFIO) \
 			$(LIBPDFIO_STATIC) \
 			examples/createCarioTestPDF \
-			examples/pdf2cairo \
+			examples/pdf2cairo/pdf2cairo_main \
 			testpdfio \
+			testpdf2cairo \
 			testttf
 DOCFILES	=	\
 			doc/pdfio.html \
@@ -135,7 +137,7 @@ EXAMPLES	=	\
 			examples/mmd.c \
 			examples/mmd.h \
 			examples/pdf2text.c \
-			examples/pdf2cairo.c \
+			examples/pdf2cairo/pdf2cairo_main.c \
 			examples/createCarioTestPDF.c \
 			examples/pdfioinfo.c
 
@@ -197,6 +199,11 @@ test:	testpdfio testttf
 	./testpdfio 2>>test.log
 	LANG=fr_FR.UTF-8 ./testpdfio 2>>test.log
 
+# Run only the renderer tests
+.PHONY: test-renderer
+test-renderer: testpdf2cairo
+	./testpdf2cairo
+
 valgrind:	testpdfio
 	valgrind --leak-check=full ./testpdfio
 
@@ -237,15 +244,19 @@ examples/createCarioTestPDF:	examples/createCarioTestPDF.o $(LIBPDFIO)
 
 
 # PDF to Cairo example 
-examples/pdf2cairo:   examples/pdf2cairo.o $(LIBPDFIO)
+examples/pdf2cairo/pdf2cairo_main:   examples/pdf2cairo/pdf2cairo_main.o $(LIBPDFIO)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ examples/pdf2cairo.o $(LIBPDFIO) $(LIBS)
+	$(CC) $(LDFLAGS) -o $@ examples/pdf2cairo/pdf2cairo_main.o $(LIBPDFIO) $(LIBS)
 
 # pdfio test program
 testpdfio:		testpdfio.o libpdfio.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testpdfio.o libpdfio.a $(LIBS)
 
+# pdf2cairo renderer test program
+testpdf2cairo: testpdf2cairo.o libpdfio.a
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ testpdf2cairo.o libpdfio.a $(LIBS)
 
 # TTF test program
 testttf:	ttf.o testttf.o
@@ -258,6 +269,7 @@ $(OBJS):		pdfio.h pdfio-private.h Makefile
 pdfio-content.o:	pdfio-content.h ttf.h
 testpdfio.o:		test.h
 testttf.o:		ttf.h
+testpdf2cairo.o: test.h
 ttf.o:			ttf.h
 
 
