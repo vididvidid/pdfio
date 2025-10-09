@@ -101,9 +101,15 @@ PUBOBJS		=	\
 LIBOBJS		=	\
 			$(PUBOBJS) \
 			ttf.o
+
+# Variables for the pdf2cairo example
+PDF2CAIRO_DIR = examples/pdf2cairo
+PDF2CAIRO_SRCS = $(wildcard $(PDF2CAIRO_DIR)/*.c)
+PDF2CAIRO_OBJS = $(PDF2CAIRO_SRCS:.c=.o)
+
 OBJS		=	\
 			$(LIBOBJS) \
-			examples/pdfcairo/pdf2cairo_main.o \
+			$(PDF2CAIRO_OBJS) \
 			examples/createCarioTestPDF.o \
 			testpdfio.o \
 			testpdf2cairo.o \
@@ -244,9 +250,9 @@ examples/createCarioTestPDF:	examples/createCarioTestPDF.o $(LIBPDFIO)
 
 
 # PDF to Cairo example 
-examples/pdf2cairo/pdf2cairo_main:   examples/pdf2cairo/pdf2cairo_main.o $(LIBPDFIO)
+examples/pdf2cairo/pdf2cairo_main:   $(PDF2CAIRO_OBJS) $(LIBPDFIO)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ examples/pdf2cairo/pdf2cairo_main.o $(LIBPDFIO) $(LIBS)
+	$(CC) $(LDFLAGS) -o $@ $(PDF2CAIRO_OBJS) $(LIBPDFIO) $(LIBS)
 
 # pdfio test program
 testpdfio:		testpdfio.o libpdfio.a

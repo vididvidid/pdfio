@@ -25,7 +25,7 @@ static const char *output_path = "testfiles/renderer-output/";
 static renderer_test_t tests[] = 
 {
   { "Stroked box", "01_stroked_box.pdf", "-v -p 1 -r 300", "o", "01.png" },
-  { "Filled RGB box", "02_filled_box_rgb.pdf", "-v", "o", "02.png"}
+  { "Filled RGB box", "02_filled_box_rgb.pdf", "", "T", ""}
 };
 
 // Main()
