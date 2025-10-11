@@ -24,8 +24,30 @@ static const char *output_path = "testfiles/renderer-output/";
 // Array of renderer test cases
 static renderer_test_t tests[] = 
 {
-  { "Stroked box", "01_stroked_box.pdf", "-v -p 1 -r 300", "o", "01.png" },
-  { "Filled RGB box", "02_filled_box_rgb.pdf", "", "T", ""}
+  { "Stroked box", "01_stroked_box.pdf", "", "o", "01.png" },
+  { "Filled RGB box", "02_filled_box_rgb.pdf", "", "T", ""},
+  { "Nested Box", "03_nested_state.pdf", "", "T", ""},
+  { "Cubic_Bezier_Curve", "04_Cubic_Bezier_Curve.pdf", "", "T", ""},
+  { "Curves" , "05_Curves.pdf", "", "T", ""},
+  { "Fill and Stroke", "06_fill_and_stroke.pdf", "", "T", ""},
+  { "Shape with hole", "07_shape_with_holes.pdf", "", "T", ""},
+  { "TestFilledBanners", "TestFilledBanners.pdf", "", "T", ""},
+  { "TestFilledBasicShapesPart1", "TestFilledBasicShapesPart1.pdf", "", "T", ""},
+  { "TestFilledBasicShapesPart2", "TestFilledBasicShapesPart2.pdf", "", "T", ""},
+  { "TestFilledBlockArrows", "TestFilledBlockArrows.pdf", "", "T", ""},
+  { "TestFilledEquationShapes", "TestFilledEquationShapes.pdf", "", "T", ""},
+  { "TestFilledFlowChart", "TestFilledFlowChart.pdf", "", "T", ""},
+  { "TestFilledRectangles", "TestFilledRectangles.pdf", "", "T", ""},
+  { "TestFilledStars", "TestFilledStars.pdf", "", "T", ""},
+  { "TestStrokedBanners", "TestStrokedBanners.pdf", "" , "T", ""},
+  { "TestStrokedBasicShapesPart1", "TestStrokedBasicShapesPart1.pdf", "", "T", ""},
+  { "TestStrokedBasicShapesPart2", "TestStrokedBasicShapesPart2.pdf", "", "T", ""},
+  { "TestStrokedBlockArrows", "TestStrokedBlockArrows.pdf", "", "T", ""},
+  { "TestStrokedEquationShapes", "TestStrokedEquationShapes.pdf", "", "T", ""},
+  { "TestStrokedFlowChart", "TestStrokedFlowChart.pdf", "", "T", ""},
+  { "TestStrokedRectangles", "TestStrokedRectangles.pdf", "", "T", ""},
+  { "TestStrokedStars", "TestStrokedStars.pdf", "", "T", ""},
+  { "TestTables", "TestTables.pdf", "", "T", ""}
 };
 
 // Main()
