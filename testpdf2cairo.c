@@ -47,7 +47,9 @@ static renderer_test_t tests[] =
   { "TestStrokedFlowChart", "TestStrokedFlowChart.pdf", "", "T", ""},
   { "TestStrokedRectangles", "TestStrokedRectangles.pdf", "", "T", ""},
   { "TestStrokedStars", "TestStrokedStars.pdf", "", "T", ""},
-  { "TestTables", "TestTables.pdf", "", "T", ""}
+  { "TestTables", "TestTables.pdf", "", "T", ""},
+  { "test_file_1pg", "test_file_1pg.pdf", "", "T", ""},
+  { "simpleText", "simpleText.pdf", "-v", "T", ""}
 };
 
 // Main()
